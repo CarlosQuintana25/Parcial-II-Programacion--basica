@@ -56,10 +56,13 @@ vector<Comentario> COMENTARIOS;
 vector<CarritoDeCompras> CARRITOS;
 
 // ===================== UTILIDADES =====================
-string upperCopy(string s){ 
-    for(char &c:s) c=(char)toupper((unsigned char)c); 
-    return s; 
-}// Mayúsculas
+string upperCopy(string s){
+    for (char &c : s) {
+        c = (char)toupper((unsigned char)c);
+    }
+    return s;
+}
+// Mayúsculas
 
 tuple<int,int,int> ConvertirFecha(const string& ddmmyyyy){
     int d=0,m=0,y=0; 
@@ -73,19 +76,50 @@ bool compararFecha(const string& f, const string& desde){
     return ConvertirFecha(f) >= ConvertirFecha(desde); 
 }// Comparar fechas
 
-Usuario* buscarUsuario(const string& correo, const string& clave){
-    for (auto &u: USUARIOS) if (u.correoElectronico==correo && u.contrasena==clave) return &u;
+Usuario* buscarUsuario(const string& correo, const string& clave) {
+    for (auto &u : USUARIOS) {
+        if (u.correoElectronico == correo && u.contrasena == clave) {
+            return &u;
+        }
+    }
     return nullptr;
 }
-Producto* buscarProducto(int id){ 
-    for (auto &p: PRODUCTOS) if (p.idProducto==id) return &p; 
-    return nullptr; 
-}
-int idPorNombreProducto(const string& nombre){ 
-    for (const auto& p: PRODUCTOS) if (p.nombre==nombre) return p.idProducto; return -1; }
 
-CarritoDeCompras* carritoDeUsuario(int idUsuario){ for (auto &c: CARRITOS) if (c.idUsuario==idUsuario) return &c; return nullptr; }
-int siguienteIdCarrito(){ int mx=0; for(auto &c:CARRITOS) mx=max(mx,c.idCarrito); return mx+1; }
+Producto* buscarProducto(int id) {
+    for (auto &p : PRODUCTOS) {
+        if (p.idProducto == id) {
+            return &p;
+        }
+    }
+    return nullptr;
+}
+
+int idPorNombreProducto(const string& nombre) {
+    for (const auto &p : PRODUCTOS) {
+        if (p.nombre == nombre) {
+            return p.idProducto;
+        }
+    }
+    return -1;
+}
+
+
+CarritoDeCompras* carritoDeUsuario(int idUsuario) {
+    for (auto &c : CARRITOS) {
+        if (c.idUsuario == idUsuario) {
+            return &c;
+        }
+    }
+    return nullptr;
+}
+int siguienteIdCarrito() {
+    int mx = 0;
+    for (auto &c : CARRITOS) {
+        mx = max(mx, c.idCarrito);
+    }
+    return mx + 1;
+}
+
 
 // ===================== INICIALIZACIÓN  =====================
 void initUsuarios(){
@@ -217,6 +251,8 @@ void listarProductos(int umbral){
         if (p.stock < umbral)
             cout << "["<<p.idProducto<<"] "<<p.nombre<<" | stock="<<p.stock
                  <<" | $"<<fixed<<setprecision(2)<<p.precio<<"\n";
+    system("pause");
+    system("cls");
 }
 
 void buscarComentarios(const string& desde){
@@ -229,6 +265,8 @@ void buscarComentarios(const string& desde){
              << (p? p->nombre : "Producto?")
              << ": " << c.contenido << "\n";
     }
+    system("pause");
+    system("cls");
 } 
 
 void listarUsuarios(){
@@ -238,8 +276,10 @@ void listarUsuarios(){
              <<" | correo="<<u.correoElectronico
              <<" | direccion="<<u.direccion
              <<" | metodoDePago="<<u.metodoDePago<<"\n";
+    system("pause");
+    system("cls");
 }
-
+//Como en el ejercicio no se especifica como se calcula el total, se asume que es subtotal + impuestos, y los impuestos se toma el 19% por el iva.
 void agregarAlCarro(Usuario& u, int idProducto, int cantidad){
     Producto* prod = buscarProducto(idProducto);
     if (!prod){ cout << "Producto no existe.\n"; return; }
@@ -272,7 +312,7 @@ void agregarAlCarro(Usuario& u, int idProducto, int cantidad){
 void verCarrito(Usuario& u){
     CarritoDeCompras* car = carritoDeUsuario(u.idUsuario);
     if (!car || car->items.empty()){ cout << "\nCarrito vacío.\n"; return; }
-    cout << "\n--- Carrito (ID " << car->idCarrito << ") ---\n";
+    cout << "\n--- Carrito de " << u.nombre << " (ID " << car->idCarrito << ") ---\n";
     for (auto &it: car->items){
         auto* p = buscarProducto(it.idProducto);
         cout << "["<<it.idProducto<<"] " << (p? p->nombre : "Producto?")
