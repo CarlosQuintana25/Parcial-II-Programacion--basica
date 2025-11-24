@@ -36,25 +36,13 @@ struct Comentario {
     string fecha;       
 };
 
-struct CarritoItem {
-    int idProducto;
-    int cantidad;
-    double precioUnitario;
-};
 
-struct CarritoDeCompras {
-    int idCarrito;
-    int idUsuario;
-    vector<CarritoItem> items;
-    double subtotal;
-    double impuestos;
-};
 
 // ===================== VECTORES =====================
 vector<Usuario> USUARIOS;
 vector<Producto> PRODUCTOS;
 vector<Comentario> COMENTARIOS;
-vector<CarritoDeCompras> CARRITOS;
+
 
 // ===================== UTILIDADES =====================
 string upperCopy(string s){
@@ -105,22 +93,6 @@ int idPorNombreProducto(const string& nombre) {
 }
 
 
-CarritoDeCompras* carritoDeUsuario(int idUsuario) {
-    for (auto &c : CARRITOS) {
-        if (c.idUsuario == idUsuario) {
-            return &c;
-        }
-    }
-    return nullptr;
-}
-int siguienteIdCarrito() {
-    int mx = 0;
-    for (auto &c : CARRITOS) {
-        mx = max(mx, c.idCarrito);
-    }
-    return mx + 1;
-}
-
 string convertirFechaaDDMMYYYY(const string& fechas) {
     return fechas.substr(8, 2) + "/" + fechas.substr(5, 2) + "/" + fechas.substr(0, 4);
 }// Cambiar formato de fecha de yyyy/mm/dd a dd/mm/yyyy
@@ -136,7 +108,7 @@ void initUsuarios() {
     }
 
     string linea;
-    getline(file, linea); // saltar encabezado
+    getline(file, linea); 
 
     while (getline(file, linea)) {
         if (linea.empty()) continue;
@@ -173,7 +145,7 @@ void initProductos() {
     }
 
     string linea;
-    getline(file, linea); // saltar encabezado
+    getline(file, linea); 
 
     while (getline(file, linea)) {
         if (linea.empty()) continue;
@@ -208,7 +180,7 @@ void initComentarios() {
     }
 
     string linea;
-    getline(file, linea); // saltar encabezado
+    getline(file, linea); 
 
     while (getline(file, linea)) {
         if (linea.empty()) continue;
