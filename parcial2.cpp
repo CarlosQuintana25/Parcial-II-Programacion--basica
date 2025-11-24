@@ -271,48 +271,78 @@ void listarUsuarios(){
     system("pause");
     system("cls");
 }
-//Como en el ejercicio no se especifica como se calcula el total, se asume que es subtotal + impuestos, y los impuestos se toma el 19% por el iva.
 void agregarAlCarro(Usuario& u, int idProducto, int cantidad){
     Producto* prod = buscarProducto(idProducto);
     if (!prod){ cout << "Producto no existe.\n"; return; }
-    if (cantidad<=0){ cout << "Cantidad inválida.\n"; return; }
-    if (prod->stock < cantidad){ cout << "Stock insuficiente. Disponible: "<<prod->stock<<"\n"; return; }
+    if (cantidad <= 0){ cout << "Cantidad inválida.\n"; return; }
+    if (prod->stock < cantidad){
+        cout << "Stock insuficiente. Disponible: " << prod->stock << "\n";
+        return;
+    }
+    double total = prod->precio * cantidad;
 
-    CarritoDeCompras* car = carritoDeUsuario(u.idUsuario);
-    if (!car){
-        CARRITOS.push_back({siguienteIdCarrito(), u.idUsuario, {}, 0.0, 0.0});
-        car = &CARRITOS.back();
+    ofstream file("Carrito.txt", ios::app);
+    if (!file.is_open()) {
+        cout << "ERROR: No se pudo abrir Carrito.txt\n";
+        return;
     }
 
-    bool found=false;
-    for (auto &it: car->items) if (it.idProducto==idProducto){ it.cantidad+=cantidad; found=true; break; }
-    if (!found) car->items.push_back({idProducto, cantidad, prod->precio});
+    file << u.idUsuario << ","
+         << prod->idProducto << ","
+         << prod->nombre << ","
+         << cantidad << ","
+         << prod->precio << ","
+         << total << "\n";
+
+    file.close();
+
 
     prod->stock -= cantidad;
-
-    double sub=0.0; for (auto &it: car->items) sub += it.precioUnitario * it.cantidad;
-    car->subtotal = sub;
-    car->impuestos = sub * 0.19;
-
-    cout << "Agregado. Carrito #" << car->idCarrito
-         << " | Subtotal: $" << fixed << setprecision(2) << car->subtotal
-         << " | Impuestos: $" << car->impuestos << "\n";
+    cout << "Producto agregado al carrito y guardado en Carrito.txt\n";
     system("pause");
     system("cls");
 }
 
+
 void verCarrito(Usuario& u){
-    CarritoDeCompras* car = carritoDeUsuario(u.idUsuario);
-    if (!car || car->items.empty()){ cout << "\nCarrito vacío.\n"; return; }
-    cout << "\n--- Carrito de " << u.nombre << " (ID " << car->idCarrito << ") ---\n";
-    for (auto &it: car->items){
-        auto* p = buscarProducto(it.idProducto);
-        cout << "["<<it.idProducto<<"] " << (p? p->nombre : "Producto?")
-             << " x" << it.cantidad
-             << " @ $" << fixed << setprecision(2) << it.precioUnitario
-             << " = $" << (it.precioUnitario * it.cantidad) << "\n";
+    ifstream file("Carrito.txt");
+    if (!file.is_open()) {
+        cout << "No hay carrito o no se pudo abrir Carrito.txt\n";
+        return;
     }
-    cout << "Subtotal: $" << car->subtotal << " | Impuestos: $" << car->impuestos << "\n";
+
+    cout << "\n=== Carrito del usuario " << u.nombre << " ===\n";
+
+    string linea;
+    bool encontrado = false;
+
+    while (getline(file, linea)) {
+        if (linea.empty()) continue;
+
+        stringstream ss(linea);
+        string idU, idProd, nombreProd, cant, precio, total;
+
+        getline(ss, idU, ',');
+        getline(ss, idProd, ',');
+        getline(ss, nombreProd, ',');
+        getline(ss, cant, ',');
+        getline(ss, precio, ',');
+        getline(ss, total, ',');
+
+        if (stoi(idU) == u.idUsuario) {
+            encontrado = true;
+            cout << "Producto: " << nombreProd
+                 << " | Cantidad: " << cant
+                 << " | Precio: " << precio
+                 << " | Total: " << total
+                 << "\n";
+        }
+    }
+
+    if (!encontrado)
+        cout << "Carrito vacío.\n";
+
+    file.close();
     system("pause");
     system("cls");
 }
