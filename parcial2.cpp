@@ -8,6 +8,8 @@
 #include <tuple>
 #include <cstdlib>
 #include <fstream>
+#include <locale>
+
 using namespace std;
 
 // ===================== MODELOS =====================
@@ -318,6 +320,106 @@ void verCarrito(Usuario& u){
     system("pause");
     system("cls");
 }
+// ===================== REPORTES (PARCIAL 3) =====================
+ 
+void reporteProductosStockBajo() {
+    cout << "\n--- 5 productos con el stock más bajo ---\n";
+    vector<Producto> listaOrdenada = PRODUCTOS;
+
+    sort(listaOrdenada.begin(), listaOrdenada.end(),
+        [](const Producto& uno, const Producto& dos) {
+            return uno.stock < dos.stock;
+        }
+    );
+
+    int cantidadAMostrar = (listaOrdenada.size() < 5 ? listaOrdenada.size() : 5);
+
+    for (int i = 0; i < cantidadAMostrar; i++) {
+        cout << listaOrdenada[i].idProducto 
+             << " | " << listaOrdenada[i].nombre
+             << " | Stock: " << listaOrdenada[i].stock << "\n";
+    }
+
+    system("pause");
+    system("cls");
+}
+
+
+void reporteCantidadComentariosFecha() {
+    cout << "\nIngrese la fecha (dd/mm/aaaa): ";
+    string fecha;
+    cin >> fecha;
+
+    int contador = 0;
+    for (const auto& c : COMENTARIOS) {
+        if (c.fecha == fecha) contador++;
+    }
+
+    cout << "\n--- Cantidad de comentarios ---\n";
+    cout << "Fecha: " << fecha << "\n";
+    cout << "Cantidad de comentarios: " << contador << "\n";
+
+    system("pause");
+    system("cls");
+}
+
+
+void reportePrecioMaxMin() {
+    if (PRODUCTOS.empty()) {
+        cout << "No hay productos cargados.\n";
+        return;
+    }
+
+    double minPrecio = PRODUCTOS[0].precio;
+    double maxPrecio = PRODUCTOS[0].precio;
+
+    for (const auto& p : PRODUCTOS) {
+        minPrecio = min(minPrecio, p.precio);
+        maxPrecio = max(maxPrecio, p.precio);
+    }
+
+    cout << "\n--- Precios Máximo y Mínimo ---\n";
+    cout << "Precio mínimo: " << fixed << setprecision(2) << minPrecio << "\n";
+    cout << "Precio máximo: " << fixed << setprecision(2) << maxPrecio << "\n";
+
+    system("pause");
+    system("cls");
+}
+
+void menuReportes() {
+    while (true) {
+        cout << "\n=== Reportes ===\n";
+        cout << "1) Mostrar los 5 productos con menor stock\n";
+        cout << "2) Cantidad de comentarios en una fecha\n";
+        cout << "3) Precio máximo y mínimo de los productos\n";
+        cout << "4) Volver\n";
+        cout << "Opción: ";
+
+        int op;
+        cin >> op;
+
+        if (op == 1) {
+            system("cls");
+            reporteProductosStockBajo();
+        }
+        else if (op == 2) {
+            system("cls");
+            reporteCantidadComentariosFecha();
+        }
+        else if (op == 3) {
+            system("cls");
+            reportePrecioMaxMin();
+        }
+        else if (op == 4) {
+            system("cls");
+            return;
+        }
+        else {
+            cout << "Opción inválida.\n";
+        }
+    }
+}
+
 
 // ===================== MENÚ =====================
 void menuUsuario(Usuario& u){
@@ -328,43 +430,60 @@ void menuUsuario(Usuario& u){
         cout << "3) Listar usuarios \n";
         cout << "4) Agregar producto al carrito \n";
         cout << "5) Listar productos del carrito\n";
-        cout << "6) Salir\n";
+        cout << "6) Reportes\n";
+        cout << "7) Salir\n";
         cout << "Opción: ";
-        int op; if(!(cin>>op)) return;
+        int op; 
+        if(!(cin>>op)) return;
 
         if (op==1){
             system("cls");
             listarProductos(15);
-        } else if (op==2){
+        } 
+        else if (op==2){
             system("cls");
-            cout << "Fecha (dd/mm/aaaa): "; 
-            string f; 
-            cin>>f; 
+            cout << "Fecha (dd/mm/aaaa): ";
+            string f;
+            cin >> f;
             buscarComentarios(f);
-        } else if (op==3){
+        } 
+        else if (op==3){
             system("cls");
             listarUsuarios();
-        } else if (op==4){
+        } 
+        else if (op==4){
             system("cls");
-            int idP,cant; 
-            cout<<"ID producto: ";
-            cin>>idP; 
-            cout<<"Cantidad: ";
-            cin>>cant; 
-            agregarAlCarro(u,idP,cant);
-        } else if (op==5){
+            int idP, cant;
+            cout << "ID producto: ";
+            cin >> idP;
+            cout << "Cantidad: ";
+            cin >> cant;
+            agregarAlCarro(u, idP, cant);
+        } 
+        else if (op==5){
             system("cls");
             verCarrito(u);
-        } else if (op==6){
-            cout << "Hasta luego.\n"; break;
-        } else {
+        } 
+        else if (op==6){
+            system("cls");
+            menuReportes();
+        }
+        else if (op==7){
+            cout << "Hasta luego.\n";
+            break;
+        }
+        else {
             cout << "Opción inválida.\n";
         }
     }
 }
 
+
+
 // ===================== MAIN =====================
 int main(){
+    setlocale(LC_ALL, "");
+    system("chcp 65001 > nul"); 
     
     initUsuarios();
     initProductos();
